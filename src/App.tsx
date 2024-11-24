@@ -64,42 +64,30 @@ const App: React.FC = () => {
   };
 
   const moveItem = useCallback(
-    (itemId: string, targetId: string | null, targetIsFolder: boolean) => {
+    (draggedItemId: string, targetItemId: string | null) => {
       setItems((prevItems) => {
-        const updatedItems = [...prevItems]
-        const movedItem = updatedItems.find((item) => item.id === itemId);
-        const targetItem = updatedItems.find((item) => item.id === targetId);
+        console.log(draggedItemId, targetItemId)
+        const draggedItem = prevItems.find((item) => item.id === draggedItemId);
+        const targetItem = targetItemId ? prevItems.find((item) => item.id === targetItemId) : null;
 
-        if (movedItem) {
-          // Remove the item from its current parent
-          if (movedItem.parentId) {
-            const currentParent = updatedItems.find((item) => item.id === movedItem.parentId);
-            if (currentParent && currentParent.items) {
-              currentParent.items = currentParent.items.filter((id) => id !== itemId);
-            }
-          } else {
-            updatedItems.splice(updatedItems.indexOf(movedItem), 1);
-          }
+        if (!draggedItem) return prevItems;
 
-          // Move the item to the new location
-          if (targetId === null) {
-            // Moving to root level
-            movedItem.parentId = null;
-            updatedItems.push(movedItem);
-          } else if (targetIsFolder && targetItem) {
-            // Moving into a folder
-            movedItem.parentId = targetId;
-            if (!targetItem.items) targetItem.items = [];
-            targetItem.items.push(itemId);
-          } else if (targetItem) {
-            // Reordering within the same level
-            movedItem.parentId = targetItem.parentId;
-            const targetIndex = updatedItems.indexOf(targetItem);
-            updatedItems.splice(targetIndex, 0, movedItem);
-          }
+        const newItems = prevItems.filter((item) => item.id !== draggedItemId);
+
+        if (targetItem && targetItem.isFolder) {
+          // Moving into a folder
+          draggedItem.parentId = targetItem.id;
+          newItems.push(draggedItem);
+        } else if (targetItem) {
+          // Reordering within the same level
+          const targetIndex = newItems.findIndex((item) => item.id === targetItemId);
+          newItems.splice(targetIndex, 0, { ...draggedItem, parentId: targetItem.parentId });
+        } else {
+          // Moving to the root level
+          newItems.push({ ...draggedItem, parentId: null });
         }
 
-        return updatedItems;
+        return newItems;
       });
     },
     []

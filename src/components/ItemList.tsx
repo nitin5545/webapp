@@ -5,7 +5,7 @@ import { Item } from '../types';
 
 interface ItemListProps {
   items: Item[];
-  moveItem: (itemId: string, targetId: string | null, targetIsFolder: boolean) => void;
+  moveItem: (itemId: string, targetId: string | null) => void;
   onToggleFolder: (id: string) => void;
   onDragEnd: () => void;
   parentId : string | null
@@ -16,14 +16,14 @@ const ItemList: React.FC<ItemListProps> = ({ items, moveItem, onToggleFolder, on
     accept: 'ITEM',
     drop: (item: { id: string }, monitor) => {
       if (!monitor.didDrop()) {
-        moveItem(item.id, null, false);
+        moveItem(item.id, null);
         onDragEnd();
       }
     },
   });
 
   return (
-    <div ref={drop} style={{ minHeight: '100px', padding: '10px' }}>
+    <div ref={drop} style={{minHeight: '50px', padding: '10px' }}>
       {items.filter(item => item.parentId === parentId).map((item, index) => (
         <DraggableItem
           key={item.id}

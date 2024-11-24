@@ -8,7 +8,7 @@ interface DraggableItemProps {
   item: Item;
   allItems : Item[]
   index: number;
-  moveItem: (itemId: string, targetId: string | null, targetIsFolder: boolean) => void;
+  moveItem: (itemId: string, targetId: string | null) => void;
   onToggleFolder: (id: string) => void;
   onDragEnd: () => void;
 }
@@ -44,7 +44,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, index, moveItem, on
         return;
       }
 
-      moveItem(draggedId, hoveredId, item.isFolder);
+      moveItem(draggedId, hoveredId);
     }
   });
 
@@ -65,7 +65,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, index, moveItem, on
           <span>{item.title}</span>
         </div>
       )}
-      {item.isFolder && item.isOpen && item.items && (
+      {item.isFolder && item.isOpen && (
         <div style={{ marginLeft: '20px' }}>
           <ItemList items={allItems} parentId={item.id} moveItem={moveItem} onToggleFolder={onToggleFolder} onDragEnd={onDragEnd} />
         </div>
